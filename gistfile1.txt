@@ -1,0 +1,83 @@
+# import libraries
+from gtts import gTTS
+import re
+import os
+from string import punctuation
+import string
+import pyttsx3
+
+
+# Change the document to set it to Turkish, delete unnecessary spaces, correct carat words, shrink all words, etc. Define the text preprocessing function.
+def norm_doc(single_doc):
+    single_doc= "Metin Başlangıcı! " + single_doc
+    single_doc=re.sub(r'([!?.])\1+', r'\1', single_doc)
+    single_doc=re.sub(r'(\d+)([a-zA-Z]+)', r'\1 \2', single_doc)
+    single_doc = single_doc.replace(" ’", "’")
+    single_doc = single_doc.replace(".", ". ")
+    single_doc = single_doc.replace(",", ",")
+    single_doc = single_doc.replace("/", " taksim ")
+    single_doc = single_doc.replace(" vb.", "ve benzeri")
+    single_doc = single_doc.replace("dahil", "DÂHİL")    
+    single_doc = single_doc.replace("dahil", "dergâh")
+    single_doc = single_doc.replace("dahil", "gâvur")
+    single_doc = single_doc.replace("dahil", "karargâh")
+    single_doc = single_doc.replace("dahil", "tezgâh")
+    single_doc = single_doc.replace("dahil", "yadigâr")
+    single_doc = single_doc.replace("dahil", "Nigâr")
+    single_doc = single_doc.replace("dahil", "dükkân")
+    single_doc = single_doc.replace("dahil", "hikâye")
+    single_doc = single_doc.replace("dahil", "kâfir")
+    single_doc = single_doc.replace("dahil", "kâğıt")
+    single_doc = single_doc.replace("dahil", "Hakkâri")
+    single_doc = single_doc.replace("dahil", "Kâzım")
+    single_doc = single_doc.replace("dahil", "gülgûn")
+    single_doc = single_doc.replace("dahil", "merzengûş")
+    single_doc = single_doc.replace("dahil", "mahkûm")
+    single_doc = single_doc.replace("dahil", "mezkûr")
+    single_doc = single_doc.replace("dahil", "sükûn")
+    single_doc = single_doc.replace("dahil", "sükût")
+    pattern3 = r'(\b5\d+)\.'
+    single_doc = re.sub(pattern3, lambda match: match.group(1) + " üncü", single_doc)
+    pattern3 = r'(\b4\d+)\.'
+    single_doc = re.sub(pattern3, lambda match: match.group(1) + " üncü", single_doc)
+    pattern5 = r'(\b6\d+)\.'
+    single_doc = re.sub(pattern5, lambda match: match.group(1) + " ncı", single_doc)
+    pattern8 = r'(\b9\d+)\.'
+    single_doc = re.sub(pattern8, lambda match: match.group(1) + " uncu", single_doc)   
+    pattern9 = r'(\b10\d+)\.'
+    single_doc = re.sub(pattern9, lambda match: match.group(1) + " uncu", single_doc)   
+    pattern10 = r"[{}]".format("-;_{}") 
+    single_doc = re.sub(pattern10, " ", single_doc) 
+    single_doc = re.sub(r'\s+', ' ', single_doc, flags=re.I)
+    single_doc = single_doc.lower()
+    single_doc = single_doc.strip()
+    #single_doc= re.sub(r'\b[a-zA-Z]\b', '', single_doc)
+    ending= ". Metin Sonu!"
+    single_doc= single_doc + ending
+    return single_doc
+
+
+with open('yourtext.txt', 'r', encoding='utf-8') as document:  #opens file in your folder
+    doc = document.read()
+
+my_document=norm_doc(doc)
+
+### gTTS
+
+speech  = gTTS(text= str(my_document),lang="tr",slow=False)
+speech.save("voice.mp3")
+os.system("voice.mp3")
+
+### pyttsx3
+
+engine= pyttsx3.init()
+voices= engine.getProperty("voices")
+rate = engine.getProperty('rate')
+engine.setProperty('rate', 110) 
+engine.setProperty('voice', voices[1].id)
+engine.setProperty('volume',1.0)
+engine.say(str(my_document))
+engine.runAndWait()
+engine.stop()
+
+
